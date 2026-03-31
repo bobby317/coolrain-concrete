@@ -8,7 +8,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
-  const [formStatus, setFormStatus] = useState<"idle" | "success" | "error">("idle");
+  const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -66,23 +66,37 @@ export default function Home() {
     setLightboxImg(null);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
     const phone = (form.elements.namedItem("phone") as HTMLInputElement).value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    
+
     if (!name || !phone || !email || !email.includes("@")) {
       setFormStatus("error");
       return;
     }
 
-    setFormStatus("success");
-    form.reset();
-    setTimeout(() => {
-      setFormStatus("idle");
-    }, 5000);
+    setFormStatus("submitting");
+
+    try {
+      const res = await fetch("https://formspree.io/f/xreokrbw", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: new FormData(form),
+      });
+
+      if (res.ok) {
+        setFormStatus("success");
+        form.reset();
+        setTimeout(() => setFormStatus("idle"), 5000);
+      } else {
+        setFormStatus("error");
+      }
+    } catch {
+      setFormStatus("error");
+    }
   };
 
   return (
@@ -129,10 +143,10 @@ export default function Home() {
 
       {/* SECTION: Hero */}
       <section id="hero" className="hero">
-        <div className="container container-wide hero-content">
-          <h1 className="hero-title reveal">BUILT TO LAST.<br />MIXED WITH TRUST.</h1>
-          <p className="hero-subtitle reveal" style={{ transitionDelay: "100ms" }}>Ready Mix Concrete & Concrete Products — Laois & Nationwide</p>
-          <div className="hero-ctas reveal" style={{ transitionDelay: "200ms" }}>
+          <div className="container container-wide hero-content">
+            <h1 className="hero-title reveal">COOLRAIN CONCRETE</h1>
+            <p className="hero-subtitle reveal" style={{ transitionDelay: "100ms" }}>Ready Mix Concrete & Concrete Products — Laois & Nationwide</p>
+            <div className="hero-ctas reveal" style={{ transitionDelay: "200ms" }}>
             <a href="#quote" className="btn btn-primary">Get a Free Quote</a>
             <a href="tel:0872568365" className="btn btn-secondary">Call 087 256 8365</a>
           </div>
@@ -146,7 +160,7 @@ export default function Home() {
         <section id="about" className="about">
           <div className="container about-grid">
               <div className="about-image reveal">
-                <img src="https://images.unsplash.com/photo-1605216663887-3fe02b5c44df?q=80&w=800&auto=format&fit=crop" alt="Laois concrete plant aerial view" />
+                <img src="/aerial-plant.jpg" alt="Laois concrete plant aerial view" />
               </div>
           <div className="about-text reveal" style={{ transitionDelay: "150ms" }}>
             <span className="section-tag">WHO WE ARE</span>
@@ -273,7 +287,7 @@ export default function Home() {
             <p style={{ color: "var(--color-text-muted)" }}>We&apos;ll get back to you within one business day.</p>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form action="https://formspree.io/f/xreokrbw" method="POST" onSubmit={handleSubmit} noValidate>
             {formStatus === "success" && (
               <div className="form-success" style={{ display: "block" }}>
                 Thanks! We&apos;ll be in touch shortly.
@@ -284,7 +298,7 @@ export default function Home() {
               <div className="form-group">
                 <label className="form-label" htmlFor="name">Full Name *</label>
                 <input type="text" id="name" name="name" className="form-control" required />
-                {formStatus === "error" && <div className="form-error" style={{ display: "block" }}>Please check your fields.</div>}
+                {formStatus === "error" && <div className="form-error" style={{ display: "block" }}>Please fill in all required fields or try again.</div>}
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="phone">Phone Number *</label>
@@ -312,7 +326,9 @@ export default function Home() {
               <textarea id="message" name="message" className="form-control" rows={4}></textarea>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "var(--space-4)" }}>SEND ENQUIRY &rarr;</button>
+            <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "var(--space-4)" }} disabled={formStatus === "submitting"}>
+              {formStatus === "submitting" ? "SENDING..." : "SEND ENQUIRY →"}
+            </button>
           </form>
         </div>
       </section>
@@ -335,10 +351,10 @@ export default function Home() {
             
             <div className="contact-item">
               <div className="contact-item-icon"><Mail /></div>
-              <div className="contact-item-text">
-                <strong>Email Us</strong>
-                <a href="mailto:info@coolrainconcrete.ie">info@coolrainconcrete.ie</a>
-              </div>
+                <div className="contact-item-text">
+                  <strong>Email Us</strong>
+                  <a href="mailto:gerjimbennette@gmail.com">gerjimbennette@gmail.com</a>
+                </div>
             </div>
 
             <div className="contact-item">
@@ -352,7 +368,7 @@ export default function Home() {
 
           <div className="map-container reveal" style={{ transitionDelay: "150ms" }}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2446!2d-7.56!3d52.93!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sCoolrain%2C+Portlaoise%2C+Co.+Laois!5e0!3m2!1sen!2sie!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d152502!2d-7.58!3d52.96!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x485d0334b7dd069d%3A0x51f8efec89e2def8!2sCoolrain%20Concrete!5e0!3m2!1sen!2sie!4v1"
               width="100%" height="400" style={{ border: 0 }} allowFullScreen={false} loading="lazy">
             </iframe>
           </div>
