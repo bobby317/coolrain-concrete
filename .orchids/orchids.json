@@ -1,0 +1,10 @@
+{
+  "projectId": "a02337f7-74cf-470c-9cdf-0f830b350d00",
+  "createdAt": 1774903546756,
+  "startupCommands": [
+    "npm install; npm run dev"
+  ],
+  "templateId": "nextjs",
+  "vercelProjectId": "prj_UjjiRBvPKZ61FMyHfdPAhtEqx6K2",
+  "deployedWithUserToken": false
+}
