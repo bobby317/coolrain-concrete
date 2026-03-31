@@ -160,7 +160,7 @@ export default function Home() {
         <section id="about" className="about">
           <div className="container about-grid">
               <div className="about-image reveal">
-                <img src="/aerial-plant.jpg" alt="Laois concrete plant aerial view" />
+                <img src="/concrete-truck.jpg" alt="Coolrain Concrete mixer truck on the road" />
               </div>
           <div className="about-text reveal" style={{ transitionDelay: "150ms" }}>
             <span className="section-tag">WHO WE ARE</span>
